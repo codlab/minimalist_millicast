@@ -5,9 +5,10 @@
  * @format
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import type {PropsWithChildren} from 'react';
 import {
+  Alert,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -16,6 +17,11 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
+
+import {
+  mediaDevices,
+	registerGlobals
+} from 'react-native-webrtc';
 
 import {
   Colors,
@@ -29,8 +35,26 @@ type SectionProps = PropsWithChildren<{
   title: string;
 }>;
 
+async function debugMe() {
+  let cameraCount = 0;
+
+  try {
+    const all = await mediaDevices.enumerateDevices() as any[];
+    const devices = all.map( device => {
+      if ( device.kind != 'videoinput' ) { return; };
+
+      cameraCount = cameraCount + 1;
+    } );
+
+    Alert.alert("debug", `cameras ? ${devices.length}`);
+  } catch( err ) {
+    // Handle Error
+  };
+}
+
 function Section({children, title}: SectionProps): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+
   return (
     <View style={styles.sectionContainer}>
       <Text
@@ -43,6 +67,7 @@ function Section({children, title}: SectionProps): React.JSX.Element {
         {title}
       </Text>
       <Text
+        onPress={debugMe}
         style={[
           styles.sectionDescription,
           {
@@ -62,6 +87,11 @@ function App(): React.JSX.Element {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  useEffect(() => {
+    Alert.alert("debug", "webrtc globals registered");
+    registerGlobals();
+  }, []);
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -76,18 +106,8 @@ function App(): React.JSX.Element {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
+          <Section title="WebRtc debug">
+            Click me
           </Section>
           <LearnMoreLinks />
         </View>
