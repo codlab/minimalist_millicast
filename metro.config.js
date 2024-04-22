@@ -19,9 +19,8 @@ defaultConfig.resolver.resolveRequest = (context, moduleName, platform) => {
     // React Native requires v5 which is not compatible with react-native-webrtc.
     const eventTargetShimPath = resolveFrom(
       context.originModulePath,
-      moduleName
+      moduleName.replace(/(\/index)$/, '')
     );
-
     // Logic to resolve the module name to a file path...
     // NOTE: Throw an error if there is no resolution.
     return {
